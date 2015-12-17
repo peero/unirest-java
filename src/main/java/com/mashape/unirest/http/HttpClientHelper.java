@@ -92,7 +92,7 @@ public class HttpClientHelper {
 	public static <T> Future<HttpResponse<T>> requestAsync(HttpRequest request, final Class<T> responseClass, Callback<T> callback) {
 		HttpUriRequest requestObj = prepareRequest(request, true);
 
-		CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient();
+		CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient(request.getRequestTimeouts());
 		if (!asyncHttpClient.isRunning()) {
 			asyncHttpClient.start();
 			AsyncIdleConnectionMonitorThread asyncIdleConnectionMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
@@ -129,9 +129,7 @@ public class HttpClientHelper {
 
 	public static <T> HttpResponse<T> request(HttpRequest request, Class<T> responseClass) throws UnirestException {
 		HttpRequestBase requestObj = prepareRequest(request, false);
-		HttpClient client = ClientFactory.getHttpClient(); // The
-															// DefaultHttpClient
-															// is thread-safe
+		HttpClient client = ClientFactory.getHttpClient(request.getRequestTimeouts()); // The DefaultHttpClient is thread-safe
 
 		org.apache.http.HttpResponse response;
 		try {

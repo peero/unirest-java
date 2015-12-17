@@ -45,6 +45,11 @@ public class HttpRequestWithBody extends HttpRequest {
 		super(method, url);
 	}
 
+ @Override
+	public HttpRequestWithBody setTimeouts(long connectionTimeout, long socketTimeout) {
+		return (HttpRequestWithBody)super.setTimeouts(connectionTimeout, socketTimeout);
+	}
+
 	@Override
 	public HttpRequestWithBody routeParam(String name, String value) {
 		super.routeParam(name, value);

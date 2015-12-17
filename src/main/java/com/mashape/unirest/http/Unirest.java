@@ -42,6 +42,7 @@ import java.util.Map;
 
 public class Unirest {
 
+
 	/**
 	 * Set the HttpClient implementation to use for every synchronous request
 	 */
@@ -70,19 +71,16 @@ public class Unirest {
 
 	/**
 	 * Set the ObjectMapper implementation to use for Response to Object binding
-	 * 
+	 *
 	 * @param objectMapper Custom implementation of ObjectMapper interface
 	 */
 	public static void setObjectMapper(ObjectMapper objectMapper) {
 		Options.setOption(Option.OBJECT_MAPPER, objectMapper);
-
-		// Reload the client implementations
-		Options.refresh();
 	}
 
 	/**
 	 * Set the connection timeout and socket timeout
-	 * 
+	 *
 	 * @param connectionTimeout The timeout until a connection with the server is established (in milliseconds). Default is 10000. Set to zero to disable the timeout.
 	 * @param socketTimeout The timeout to receive data (in milliseconds). Default is 60000. Set to zero to disable the timeout.
 	 */
@@ -96,16 +94,13 @@ public class Unirest {
 
 	/**
 	 * Set the concurrency levels
-	 * 
+	 *
 	 * @param maxTotal Defines the overall connection limit for a connection pool. Default is 200.
 	 * @param maxPerRoute Defines a connection limit per one HTTP route (this can be considered a per target host limit). Default is 20.
 	 */
 	public static void setConcurrency(int maxTotal, int maxPerRoute) {
 		Options.setOption(Option.MAX_TOTAL, maxTotal);
 		Options.setOption(Option.MAX_PER_ROUTE, maxPerRoute);
-
-		// Reload the client implementations
-		Options.refresh();
 	}
 
 	/**
@@ -132,28 +127,17 @@ public class Unirest {
 	 * Close the asynchronous client and its event loop. Use this method to close all the threads and allow an application to exit.
 	 */
 	public static void shutdown() throws IOException {
-		// Closing the Sync HTTP client
-		CloseableHttpClient syncClient = (CloseableHttpClient) Options.getOption(Option.HTTPCLIENT);
-		if (syncClient != null) {
-			syncClient.close();
-		}
-
-		SyncIdleConnectionMonitorThread syncIdleConnectionMonitorThread = (SyncIdleConnectionMonitorThread) Options.getOption(Option.SYNC_MONITOR);
-		if (syncIdleConnectionMonitorThread != null) {
-			syncIdleConnectionMonitorThread.interrupt();
-		}
-
-		// Closing the Async HTTP client (if running)
-		CloseableHttpAsyncClient asyncClient = (CloseableHttpAsyncClient) Options.getOption(Option.ASYNCHTTPCLIENT);
-		if (asyncClient != null && asyncClient.isRunning()) {
-			asyncClient.close();
-		}
-
-		AsyncIdleConnectionMonitorThread asyncMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
-		if (asyncMonitorThread != null) {
-			asyncMonitorThread.interrupt();
-		}
+		Options.shutdown();
 	}
+
+	/**
+		* Note: to support request-level connection/socket timeout setting, just set timeouts on specific request.
+		* e.g.
+		* 	new GetRequest(HttpMethod.GET,url).setTimeouts(connectionTimeout,socketTimeout);
+		* or
+		* 	new HttpRequestWithBody(HttpMethod.POST,url).setTimeouts(connectionTimeout,socketTimeout);
+		*
+		* */
 
 	public static GetRequest get(String url) {
 		return new GetRequest(HttpMethod.GET, url);

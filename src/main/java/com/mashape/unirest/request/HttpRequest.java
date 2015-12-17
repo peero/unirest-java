@@ -48,11 +48,21 @@ public class HttpRequest extends BaseRequest {
 	protected String url;
 	Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
 	protected Body body;
+	private String requestTimeouts;
 
 	public HttpRequest(HttpMethod method, String url) {
 		this.httpMethod = method;
 		this.url = url;
 		super.httpRequest = this;
+	}
+
+	public HttpRequest setTimeouts(long connectionTimeout, long socketTimeout) {
+		this.requestTimeouts = String.format("%d-%d",connectionTimeout,socketTimeout);
+		return this;
+	}
+
+	public String getRequestTimeouts(){
+		return this.requestTimeouts;
 	}
 
 	public HttpRequest routeParam(String name, String value) {
